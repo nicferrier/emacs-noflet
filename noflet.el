@@ -115,5 +115,5 @@ the name `this-fn':
 This is great for overriding in testing and such like."
   (apply 'noflet|expand bindings body))
 
-(provide 'noflet-p)
-;;; noflet-p.el ends here
+(provide 'noflet)
+;;; noflet.el ends here
