@@ -89,7 +89,7 @@ name."
        (unwind-protect
             (progn
               (progn ,@fsets)
-              ,@form)
+              ,@forms)
          (progn ,@fresets)))))
  
 (defmacro noflet (bindings &rest body)
