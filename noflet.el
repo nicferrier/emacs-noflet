@@ -1,4 +1,4 @@
-;;; noflet-p.el --- locally override functions
+;;; noflet.el --- locally override functions
 
 ;; Copyright (C) 2013  Nic Ferrier
 
