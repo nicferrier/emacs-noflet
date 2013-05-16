@@ -78,7 +78,7 @@ name."
         (cl-loop
            for i in bindings
            collect
-             (cl-destructuring-bind (name test-arg args &rest body) i
+             (cl-destructuring-bind (name args &rest body) i
                (let ((saved-func-namev (make-symbol "saved-func-name")))
                  (let ((saved-func-namev
                         (intern (format "saved-func-%s"
