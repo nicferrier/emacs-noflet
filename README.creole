@@ -30,3 +30,20 @@ This specifies that two functions should be overridden:
 
 In both cases {{{this-fn}}} is used to access the original function
 definition of these common Emacs functions.
+
+=== Decorating results ===
+
+noflet can also be used to decorate results of course:
+
+{{{
+(noflet ((find-file (file-name &optional wildcards)
+           (let ((result (funcall this-fn file-name wildcards)))
+              (with-current-buffer result
+                 (setq some-buffer-local "special"))
+              result)))
+    (with-current-buffer (find-file "~/some-file")
+      (message "buffer local var is: %s" some-buffer-local)))
+}}}
+
+This overrides {{{find-file}}} to set a local variable. There are
+surely better ways to do it than this but it illustrates the point.
