@@ -113,6 +113,7 @@ the name `this-fn':
     (expand-file-name \"~/test\"))
 
 This is great for overriding in testing and such like."
+  (declare (indent defun))
   (apply 'noflet|expand bindings body))
 
 (provide 'noflet)
