@@ -113,8 +113,36 @@ the name `this-fn':
     (expand-file-name \"~/test\"))
 
 This is great for overriding in testing and such like."
-  (declare (indent defun))
+  (declare (debug ((&rest (cl-defun)) cl-declarations body))
+           (indent defun))
   (apply 'noflet|expand bindings body))
+
+(defmacro* let-while ((var expression) &rest body)
+  "A simple binding loop.
+
+VAR is bound to EXPRESSION repeatedly until `nil'.
+
+BODY is evaluated each time."
+  (declare
+   (debug (sexp sexp &rest form))
+   (indent 1))
+  (let ((expression-proc (make-symbol "exprp")))
+    `(let ((,expression-proc (lambda () ,expression)))
+       (let ((,var (funcall ,expression-proc)))
+         (while ,var
+           (progn ,@body)
+           (setq ,var (funcall ,expression-proc)))))))
+
+(defun let-while-test ()
+  (catch :io
+    (let ((lines '("line 1" "line 2")))
+      (flet ((get-line ()
+               (or
+                (pop lines)
+                (throw :io :eof))))
+        (let-while (line (get-line))
+          (message "the line is: %s" line))))))
+
 
 (provide 'noflet)
 ;;; noflet.el ends here
