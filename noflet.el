@@ -114,9 +114,11 @@ the name `this-fn':
           (funcall this-fn file-name default-dir))))
     (expand-file-name \"~/test\"))
 
-This is great for overriding in testing and such like."
+This is great for overriding in testing and such like.
+
+It is NOT currently possible to create new bindings with noflet."
   (declare (debug ((&rest (cl-defun)) cl-declarations body))
-           (indent defun))
+           (indent 1))
   (apply 'noflet|expand bindings body))
 
 (defmacro* let-while ((var expression) &rest body)
