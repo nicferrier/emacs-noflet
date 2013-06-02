@@ -29,6 +29,8 @@
 ;;; Code:
 
 (require 'cl-macs)
+(require 'cl)
+(setplist 'noflet (symbol-plist 'flet)) ;; make sure we have the right indent
 
 (defun noflet|expand (bindings &rest forms)
   "Expand BINDINGS and evaluate FORMS.
