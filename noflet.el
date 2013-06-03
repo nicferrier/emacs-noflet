@@ -4,7 +4,7 @@
 
 ;; Author: Nic Ferrier <nferrier@ferrier.me.uk>
 ;; Keywords: lisp
-;; Version: 0.0.3
+;; Version: 0.0.4
 ;; Url: https://github.com/nicferrier/emacs-noflet
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -29,8 +29,6 @@
 ;;; Code:
 
 (require 'cl-macs)
-(require 'cl)
-(setplist 'noflet (symbol-plist 'flet)) ;; make sure we have the right indent
 
 (defun noflet|expand (bindings &rest forms)
   "Expand BINDINGS and evaluate FORMS.
