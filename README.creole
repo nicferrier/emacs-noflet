@@ -11,13 +11,11 @@ function through a different name.
 Use it like this:
 
 {{{
-(noflet ((find-file-noselect
-             (file-name)
+(noflet ((find-file-noselect (file-name)
            (if (string-match-p "^#.*" file-name)
                (this-fn "/tmp/mytest")
                (this-fn file-name)))
-         (expand-file-name
-             (file-name &optional thing)
+         (expand-file-name (file-name &optional thing)
            (if (string-match-p "^#.*" file-name)
                (concat "/tmp" (file-name-as-directory 
                                (substring file-name 1)))
