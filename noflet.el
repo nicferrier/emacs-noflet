@@ -118,8 +118,10 @@ This is great for overriding in testing and such like.
 
 It is NOT currently possible to create new bindings with noflet."
   (declare (debug ((&rest (cl-defun)) cl-declarations body))
-           (indent 1))
+           (indent ((&whole 4 &rest (&whole 1 &lambda &body)) &body)))
   (apply 'noflet|expand bindings body))
+
+
 
 (defmacro* let-while ((var expression) &rest body)
   "A simple binding loop.
