@@ -1,26 +1,28 @@
 = noflet - Local function decoration =
 
+{{{noflet}}} is dynamic, local, advice for Emacs-Lisp code.
+
+It's great for test code when you need to mock another function.
+
 This is useful for definining functions that overide a base definition
 in some way. You get access to the original (before you re-defined it)
 function through a different name.
 
-It's useful for things like this:
+Use it like this:
 
 {{{
-(noflet
- ((find-file-noselect
-   (file-name)
-   (if (string-match-p "^#.*" file-name)
-       (this-fn "/tmp/mytest")
-       (this-fn file-name)))
-  (expand-file-name
-   (file-name &optional thing)
-   (if (string-match-p "^#.*" file-name)
-       (concat "/tmp" (file-name-as-directory 
-                         (substring file-name 1)))
-       (funcall this-fn file-name thing))))
- (progn 
-   (expand-file-name "#/thing")))
+(noflet ((find-file-noselect
+             (file-name)
+           (if (string-match-p "^#.*" file-name)
+               (this-fn "/tmp/mytest")
+               (this-fn file-name)))
+         (expand-file-name
+             (file-name &optional thing)
+           (if (string-match-p "^#.*" file-name)
+               (concat "/tmp" (file-name-as-directory 
+                               (substring file-name 1)))
+               (funcall this-fn file-name thing))))
+  (expand-file-name "#/thing"))
 }}}
 
 This specifies that two functions should be overridden:
@@ -33,7 +35,8 @@ definition of these common Emacs functions.
 
 === Decorating results ===
 
-noflet can also be used to decorate results of course:
+{{{noflet}}} can also be used to decorate results, just like
+{{{around-advice}}}:
 
 {{{
 (noflet ((find-file (file-name &optional wildcards)
