@@ -30,6 +30,10 @@
 
 (require 'cl-macs)
 
+(defun noflet|base ()
+  "A base function."
+  :noflet)
+
 (defun noflet|expand (bindings &rest forms)
   "Expand BINDINGS and evaluate FORMS.
 
@@ -73,7 +77,11 @@ name."
                  (let ((saved-func-namev
                         (intern (format "saved-func-%s"
                                         (symbol-name name)))))
-                   `(fset (quote ,name) ,saved-func-namev))))))
+                   `(if
+                        (eq (symbol-function (quote noflet|base))
+                            ,saved-func-namev)
+                        (fmakunbound (quote ,name))
+                        (fset (quote ,name) ,saved-func-namev)))))))
        (lets
         (cl-loop
            for i in bindings
@@ -84,7 +92,10 @@ name."
                         (intern (format "saved-func-%s"
                                         (symbol-name name)))))
                    `(,saved-func-namev
-                     (symbol-function (quote ,name)))))))))
+                     (condition-case err
+                         (symbol-function (quote ,name))
+                       (void-function
+                        (symbol-function (quote noflet|base)))))))))))
     `(let ,lets
        (unwind-protect
             (progn
@@ -114,11 +125,12 @@ the name `this-fn':
 
 This is great for overriding in testing and such like.
 
-It is NOT currently possible to create new bindings with noflet."
+If new bindings are introduced the binding is discarded upon
+exit.  Even with new bindings there is still a `this-fn'.  It
+points to `noflet|base' for all new bindings."
   (declare (debug ((&rest (cl-defun)) cl-declarations body))
            (indent ((&whole 4 &rest (&whole 1 &lambda &body)) &body)))
   (apply 'noflet|expand bindings body))
-
 
 
 (defmacro* let-while ((var expression) &rest body)
