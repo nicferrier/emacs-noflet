@@ -152,10 +152,10 @@ BODY is evaluated each time."
 (defun let-while-test ()
   (catch :io
     (let ((lines '("line 1" "line 2")))
-      (flet ((get-line ()
-               (or
-                (pop lines)
-                (throw :io :eof))))
+      (noflet ((get-line ()
+                 (or
+                  (pop lines)
+                  (throw :io :eof))))
         (let-while (line (get-line))
           (message "the line is: %s" line))))))
 
