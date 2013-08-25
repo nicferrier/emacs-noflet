@@ -133,22 +133,6 @@ points to `noflet|base' for all new bindings."
   (apply 'noflet|expand bindings body))
 
 
-(defmacro* let-while ((var expression) &rest body)
-  "A simple binding loop.
-
-VAR is bound to EXPRESSION repeatedly until `nil'.
-
-BODY is evaluated each time."
-  (declare
-   (debug (sexp sexp &rest form))
-   (indent 1))
-  (let ((expression-proc (make-symbol "exprp")))
-    `(let ((,expression-proc (lambda () ,expression)))
-       (let ((,var (funcall ,expression-proc)))
-         (while ,var
-           (progn ,@body)
-           (setq ,var (funcall ,expression-proc)))))))
-
-
 (provide 'noflet)
+
 ;;; noflet.el ends here
