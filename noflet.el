@@ -132,6 +132,15 @@ points to `noflet|base' for all new bindings."
            (indent ((&whole 4 &rest (&whole 1 &lambda &body)) &body)))
   (apply 'noflet|expand bindings body))
 
+(defmacro nolexflet (bindings &rest body)
+  "Lexical version.
+
+This only exists as an alias for `cl-flet' because Emacs
+maintainers refuse to add the correct indentation spec to
+`cl-flet'."
+  (declare (debug ((&rest (cl-defun)) cl-declarations body))
+           (indent ((&whole 4 &rest (&whole 1 &lambda &body)) &body)))
+  `(cl-flet ,bindings ,@body))
 
 (provide 'noflet)
 
