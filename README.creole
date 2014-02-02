@@ -2,6 +2,9 @@
 
 {{{noflet}}} is dynamic, local, advice for Emacs-Lisp code.
 
+{{{noflet}}} also has an Emacs indentation function for {{{flet}}}
+like macros.
+
 It's great for test code when you need to mock another function.
 
 This is useful for definining functions that overide a base definition
@@ -48,6 +51,12 @@ definition of these common Emacs functions.
 
 This overrides {{{find-file}}} to set a local variable. There are
 surely better ways to do it than this but it illustrates the point.
+
+
+=== Lexical version ===
+
+Because we include a good indenting function we also include a lexical
+{{{flet}}}. It's just a wrapper for {{{cl-flet}}}.
 
 === todo ===
 

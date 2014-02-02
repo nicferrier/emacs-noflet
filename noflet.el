@@ -4,7 +4,7 @@
 
 ;; Author: Nic Ferrier <nferrier@ferrier.me.uk>
 ;; Keywords: lisp
-;; Version: 0.0.10
+;; Version: 0.0.11
 ;; Url: https://github.com/nicferrier/emacs-noflet
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -102,7 +102,16 @@ name."
               (progn ,@fsets)
               ,@forms)
          (progn ,@fresets)))))
- 
+
+(defun noflet-indent-func (pos &rest state)
+  "Deliver sensible indenting for flet like functions."
+  ;; (message "pos: %s state: %s" pos state)
+  (save-excursion
+    (goto-char (elt (car state) 1))
+    (+ 2
+       (- (point)
+          (line-beginning-position)))))
+
 (defmacro noflet (bindings &rest body)
   "Make local function BINDINGS allowing access to the original.
 
@@ -129,7 +138,7 @@ If new bindings are introduced the binding is discarded upon
 exit.  Even with new bindings there is still a `this-fn'.  It
 points to `noflet|base' for all new bindings."
   (declare (debug ((&rest (cl-defun)) cl-declarations body))
-           (indent ((&whole 4 &rest (&whole 1 &lambda &body)) &body)))
+           (indent noflet-indent-func))
   (apply 'noflet|expand bindings body))
 
 (defmacro nolexflet (bindings &rest body)
@@ -139,7 +148,7 @@ This only exists as an alias for `cl-flet' because Emacs
 maintainers refuse to add the correct indentation spec to
 `cl-flet'."
   (declare (debug ((&rest (cl-defun)) cl-declarations body))
-           (indent ((&whole 4 &rest (&whole 1 &lambda &body)) &body)))
+           (indent noflet-indent-func))
   `(cl-flet ,bindings ,@body))
 
 (provide 'noflet)
