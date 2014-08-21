@@ -65,9 +65,10 @@ name."
                         (intern (format "saved-func-%s"
                                         (symbol-name name)))))
                    `(fset (quote ,name)
-                          (lambda ,args
-                            (let ((this-fn ,saved-func-namev))
-                              ,@body))))))))
+                          (cl-function
+                           (lambda ,args
+                             (let ((this-fn ,saved-func-namev))
+                               ,@body)))))))))
        (fresets
         (cl-loop
              for i in bindings
