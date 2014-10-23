@@ -4,7 +4,7 @@
 
 ;; Author: Nic Ferrier <nferrier@ferrier.me.uk>
 ;; Keywords: lisp
-;; Version: 0.0.11
+;; Version: 0.0.13
 ;; Url: https://github.com/nicferrier/emacs-noflet
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -29,6 +29,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(require 'cl-indent)
 
 (defun noflet|base ()
   "A base function."
@@ -152,40 +153,6 @@ maintainers refuse to add the correct indentation spec to
            (indent noflet-indent-func))
   `(cl-flet ,bindings ,@body))
 
-
-(defmacro nic-lisp1 (bindings &rest body)
-  "This makes lisp-1 functions.
-
-For example:
-
- (destructuring-bind (value func)
-    (nic-lisp1 ((a (x)
-                  (* x 7)))
-       (list (a 10) a))
-  (funcall func 6))
-
-the nic-lisp1 form returns the value of (a 10) as well as the
-original function."
-  (declare (debug ((&rest (cl-defun)) cl-declarations body))
-           (indent ((&whole 4 &rest (&whole 1 &lambda &body)) &body)))
-  (let (newenv lambdas)
-    (dolist (binding bindings)
-      (let* ((bind-var (car binding))
-             (ldef `(cl-function (lambda . ,(cdr binding))))
-             (alias-def `(lambda (&rest cl-labels-args)
-                           (cl-list* 'funcall ',bind-var
-                                     cl-labels-args))))
-        (push (cons bind-var alias-def) newenv)
-        (push (cons bind-var (list ldef)) lambdas)))
-    `(let ,lambdas
-       ,@(macroexp-unprogn
-          (macroexpand-all
-           `(progn ,@body)
-           (if (assq 'function newenv)
-               newenv
-               (cons
-                (cons 'function #'cl--labels-convert)
-                newenv)))))))
 
 (provide 'noflet)
 
