@@ -29,7 +29,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-(require 'cl-indent)
+(load-library "cl-indent")
 
 (defun noflet|base ()
   "A base function."
