@@ -4,7 +4,7 @@
 
 ;; Author: Nic Ferrier <nferrier@ferrier.me.uk>
 ;; Keywords: lisp
-;; Version: 0.0.13
+;; Version: 0.0.14
 ;; Url: https://github.com/nicferrier/emacs-noflet
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -29,7 +29,9 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-(require 'cl-indent)
+(if (version< emacs-version "24.4.1")
+    (load-library "cl-indent")
+    (require 'cl-indent))
 
 (defun noflet|base ()
   "A base function."
