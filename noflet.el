@@ -4,7 +4,7 @@
 
 ;; Author: Nic Ferrier <nferrier@ferrier.me.uk>
 ;; Keywords: lisp
-;; Version: 0.0.14
+;; Version: 0.0.15
 ;; Url: https://github.com/nicferrier/emacs-noflet
 
 ;; This program is free software; you can redistribute it and/or modify
