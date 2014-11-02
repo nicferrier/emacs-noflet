@@ -155,6 +155,21 @@ maintainers refuse to add the correct indentation spec to
            (indent noflet-indent-func))
   `(cl-flet ,bindings ,@body))
 
+(defmacro* letn (tag bindings &rest body)
+  (declare (debug (sexp sexp &rest form))
+           (indent 2))
+  `(cl-labels ((,tag ,(-map 'car bindings) ,@body))
+     (,tag ,@(-map 'cadr bindings))))
+
+(defun ntake-all (f source)
+  (letn take-all ((result nil)
+                    (src source))
+        (if src
+            (let ((l (-take-while f src)))
+              (take-all (cons l result)
+                        (nthcdr (+ 1 (length l)) src)))
+            result)))
+
 
 (provide 'noflet)
 
