@@ -150,7 +150,9 @@ points to `noflet|base' for all new bindings."
 
 This only exists as an alias for `cl-flet' because Emacs
 maintainers refuse to add the correct indentation spec to
-`cl-flet'."
+`cl-flet'.
+
+\(fn ((FUNC ARGLIST BODY...) ...) FORM...)"
   (declare (debug ((&rest (cl-defun)) cl-declarations body))
            (indent noflet-indent-func))
   `(cl-flet ,bindings ,@body))
