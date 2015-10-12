@@ -123,7 +123,7 @@ Each of the BINDINGS is done like in `flet':
 
   (noflet
     ((expand-file-name (file-name &optional default-dir)
-       (concat defaulr-dir file-name)))
+       (concat default-dir file-name)))
     (expand-file-name \"~/test\"))
 
 In each of the BINDINGS the original function is accessible with
