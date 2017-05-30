@@ -57,55 +57,22 @@ Example:
 
 It should not be necessary ever to call this.  Hence the exotic
 name."
-  (let*
-      ((fsets
+  (let
+      ((letf-bindings
         (cl-loop
-           for i in bindings
-           collect
-             (cl-destructuring-bind (name args &rest body) i
-               (let ((saved-func-namev (make-symbol "saved-func-name")))
-                 (let ((saved-func-namev
-                        (intern (format "saved-func-%s"
-                                        (symbol-name name)))))
-                   `(fset (quote ,name)
-                          (cl-function
-                           (lambda ,args
-                             (let ((this-fn ,saved-func-namev))
-                               ,@body)))))))))
-       (fresets
-        (cl-loop
-             for i in bindings
-             collect
-             (cl-destructuring-bind (name args &rest body) i
-               (let ((saved-func-namev (make-symbol "saved-func-name")))
-                 (let ((saved-func-namev
-                        (intern (format "saved-func-%s"
-                                        (symbol-name name)))))
-                   `(if
-                        (eq (symbol-function (quote noflet|base))
-                            ,saved-func-namev)
-                        (fmakunbound (quote ,name))
-                        (fset (quote ,name) ,saved-func-namev)))))))
-       (lets
-        (cl-loop
-           for i in bindings
-           collect
-             (cl-destructuring-bind (name args &rest body) i
-               (let ((saved-func-namev (make-symbol "saved-func-name")))
-                 (let ((saved-func-namev
-                        (intern (format "saved-func-%s"
-                                        (symbol-name name)))))
-                   `(,saved-func-namev
-                     (condition-case err
-                         (symbol-function (quote ,name))
-                       (void-function
-                        (symbol-function (quote noflet|base)))))))))))
-    `(let ,lets
-       (unwind-protect
-            (progn
-              (progn ,@fsets)
-              ,@forms)
-         (progn ,@fresets)))))
+         for (name args . body) in bindings
+         do (message "Name: %s; Args: %S; Body: %S" name args body)
+         ;; Save the original function
+         for orig-func = (or (symbol-function name) 'noflet|base)
+         ;; Define the new function
+         for new-func =
+         `(cl-function
+           (lambda ,args
+             (let ((this-fn #',orig-func))
+               ,@body)))
+         collect `((symbol-function ',name) ,new-func))))
+    `(cl-letf ,letf-bindings
+       ,@forms)))
 
 (defun noflet-indent-func (pos &rest state)
   "Deliver sensible indenting for flet like functions."
