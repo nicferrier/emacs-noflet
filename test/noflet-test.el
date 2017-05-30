@@ -98,6 +98,31 @@ form, that takes precedence."
    '(noflet ((my-1+ 1+))
       (should (= 3 (my-1+ 2))))))
 
+(ert-deftest noflet-test-swap-function-definitions ()
+  "Test that noflet can swap two function definitions."
+  (cl-letf (((symbol-function 'myfun1) (lambda () 1))
+            ((symbol-function 'myfun2) (lambda () 2)))
+    ;; Verify that functions work as expected first
+    (should (= (myfun1) 1))
+    (should (= (myfun2) 2))
+    ;; Now swap them
+    (eval
+     '(noflet ((myfun1 myfun2)
+               (myfun2 myfun1))
+        (should (= (myfun1) 2))
+        (should (= (myfun2) 1))))))
+
+(ert-deftest noflet-test-cl-argspec ()
+  "Test that CL-style arguments can be used in noflet bindings."
+  (noflet ((my-cl-fun
+            (arg &key key1 key2)
+            (list arg key1 key2)))
+    (should
+     (equal '(a b c)
+            (my-cl-fun 'a :key1 'b :key2 'c)))
+    (should-error (my-cl-fun))
+    (should-error (my-cl-fun 'a :badkey 'b))))
+
 (defun noflet-run-all-tests ()
   (interactive)
   (ert "^noflet-"))
