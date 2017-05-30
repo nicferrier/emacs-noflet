@@ -57,55 +57,49 @@ Example:
 
 It should not be necessary ever to call this.  Hence the exotic
 name."
-  (let*
-      ((fsets
+  (let
+      ((letf-bindings
         (cl-loop
-           for i in bindings
-           collect
-             (cl-destructuring-bind (name args &rest body) i
-               (let ((saved-func-namev (make-symbol "saved-func-name")))
-                 (let ((saved-func-namev
-                        (intern (format "saved-func-%s"
-                                        (symbol-name name)))))
-                   `(fset (quote ,name)
-                          (cl-function
-                           (lambda ,args
-                             (let ((this-fn ,saved-func-namev))
-                               ,@body)))))))))
-       (fresets
-        (cl-loop
-             for i in bindings
-             collect
-             (cl-destructuring-bind (name args &rest body) i
-               (let ((saved-func-namev (make-symbol "saved-func-name")))
-                 (let ((saved-func-namev
-                        (intern (format "saved-func-%s"
-                                        (symbol-name name)))))
-                   `(if
-                        (eq (symbol-function (quote noflet|base))
-                            ,saved-func-namev)
-                        (fmakunbound (quote ,name))
-                        (fset (quote ,name) ,saved-func-namev)))))))
-       (lets
-        (cl-loop
-           for i in bindings
-           collect
-             (cl-destructuring-bind (name args &rest body) i
-               (let ((saved-func-namev (make-symbol "saved-func-name")))
-                 (let ((saved-func-namev
-                        (intern (format "saved-func-%s"
-                                        (symbol-name name)))))
-                   `(,saved-func-namev
-                     (condition-case err
-                         (symbol-function (quote ,name))
-                       (void-function
-                        (symbol-function (quote noflet|base)))))))))))
-    `(let ,lets
-       (unwind-protect
-            (progn
-              (progn ,@fsets)
-              ,@forms)
-         (progn ,@fresets)))))
+         for (name args . body) in bindings
+         ;; Check for an alias-style redefinition, e.g.
+         ;; `(noflet ((new-name existing-function-name)) (new-name args...))
+         if (and (functionp args)
+                 (null body))
+         ;; Generate a wrapper function in the expected form of `(func
+         ;; args BODY...)'
+         do (let* ((target-func (indirect-function args))
+                   (target-is-command (interactive-form target-func))
+                   (wrapper-func
+                    ;; This wrapper ensures that the original function
+                    ;; knows when it is being called interactively.
+                    `(lambda (&rest args)
+                       ,(when target-is-command
+                          '(interactive))
+                       (if (called-interactively-p 'any)
+                           (call-interactively #',target-func)
+                         (apply #',target-func args)))))
+              (setq args (cadr wrapper-func)
+                    body (cddr wrapper-func)))
+         ;; Save the original function
+         for orig-func = (or (symbol-function name) 'noflet|base)
+         ;; Use the interactive form of the new definition if
+         ;; provided, otherwise fall back to the original interactive
+         ;; form.
+         for new-interactive-form =
+         (or (interactive-form `(lambda nil ,@body))
+             (interactive-form orig-func))
+         ;; Define the new function, with the interactive form at the
+         ;; top level so interactive commands will be recognized as
+         ;; such.
+         for new-func =
+         `(cl-function
+           (lambda ,args
+             ,new-interactive-form
+             (let ((this-fn #',orig-func))
+               ,@body)))
+         collect `((symbol-function ',name) ,new-func))))
+    `(cl-letf ,letf-bindings
+       ,@forms)))
 
 (defun noflet-indent-func (pos &rest state)
   "Deliver sensible indenting for flet like functions."
@@ -150,7 +144,9 @@ points to `noflet|base' for all new bindings."
 
 This only exists as an alias for `cl-flet' because Emacs
 maintainers refuse to add the correct indentation spec to
-`cl-flet'."
+`cl-flet'.
+
+\(fn ((FUNC ARGLIST BODY...) ...) FORM...)"
   (declare (debug ((&rest (cl-defun)) cl-declarations body))
            (indent noflet-indent-func))
   `(cl-flet ,bindings ,@body))
