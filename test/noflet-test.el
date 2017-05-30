@@ -67,7 +67,6 @@ end of input."
 
 (ert-deftest noflet-test-interactive-command ()
   "Test that interactive forms can be used in noflet function bodies."
-  :expected-result :failed
   (noflet ((myfun (x) (interactive "p") (1+ x)))
     (should (= 5 (myfun 4)))
     (should (= 3 (let ((current-prefix-arg '(2))) (call-interactively 'myfun))))))
@@ -77,7 +76,6 @@ end of input."
 
 Also test that if the overriding function has its own interactive
 form, that takes precedence."
-  :expected-result :failed
   (let ((libpath (locate-library "simple")))
     (should libpath)
     (noflet ((locate-library
@@ -94,7 +92,6 @@ form, that takes precedence."
 
 (ert-deftest noflet-test-alias ()
   "Test that noflet can alias one function to another."
-  :expected-result :failed
   ;; Failure happens during macroexpansion, so `eval' is needed to
   ;; defer expansion until the test is running.
   (eval
