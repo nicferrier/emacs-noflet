@@ -66,7 +66,9 @@ end of input."
       (myfun myvar))))
 
 (ert-deftest noflet-test-interactive-command ()
-  "Test that interactive forms can be used in noflet function bodies."
+  "Test that interactive forms can be used in noflet function bodies.
+
+This tests https://github.com/nicferrier/emacs-noflet/issues/16."
   (noflet ((myfun (x) (interactive "p") (1+ x)))
     (should (= 5 (myfun 4)))
     (should (= 3 (let ((current-prefix-arg '(2))) (call-interactively 'myfun))))))
@@ -99,7 +101,9 @@ form, that takes precedence."
       (should (= 3 (my-1+ 2))))))
 
 (ert-deftest noflet-test-swap-function-definitions ()
-  "Test that noflet can swap two function definitions."
+  "Test that noflet can swap two function definitions.
+
+This tests https://github.com/nicferrier/emacs-noflet/issues/18."
   (cl-letf (((symbol-function 'myfun1) (lambda () 1))
             ((symbol-function 'myfun2) (lambda () 2)))
     ;; Verify that functions work as expected first
