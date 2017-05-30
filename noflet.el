@@ -61,13 +61,21 @@ name."
       ((letf-bindings
         (cl-loop
          for (name args . body) in bindings
-         do (message "Name: %s; Args: %S; Body: %S" name args body)
          ;; Save the original function
          for orig-func = (or (symbol-function name) 'noflet|base)
-         ;; Define the new function
+         ;; Use the interactive form of the new definition if
+         ;; provided, otherwise fall back to the original interactive
+         ;; form.
+         for new-interactive-form =
+         (or (interactive-form `(lambda nil ,@body))
+             (interactive-form orig-func))
+         ;; Define the new function, with the interactive form at the
+         ;; top level so interactive commands will be recognized as
+         ;; such.
          for new-func =
          `(cl-function
            (lambda ,args
+             ,new-interactive-form
              (let ((this-fn #',orig-func))
                ,@body)))
          collect `((symbol-function ',name) ,new-func))))
