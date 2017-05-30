@@ -61,6 +61,25 @@ name."
       ((letf-bindings
         (cl-loop
          for (name args . body) in bindings
+         ;; Check for an alias-style redefinition, e.g.
+         ;; `(noflet ((new-name existing-function-name)) (new-name args...))
+         if (and (functionp args)
+                 (null body))
+         ;; Generate a wrapper function in the expected form of `(func
+         ;; args BODY...)'
+         do (let* ((target-func (indirect-function args))
+                   (target-is-command (interactive-form target-func))
+                   (wrapper-func
+                    ;; This wrapper ensures that the original function
+                    ;; knows when it is being called interactively.
+                    `(lambda (&rest args)
+                       ,(when target-is-command
+                          '(interactive))
+                       (if (called-interactively-p 'any)
+                           (call-interactively #',target-func)
+                         (apply #',target-func args)))))
+              (setq args (cadr wrapper-func)
+                    body (cddr wrapper-func)))
          ;; Save the original function
          for orig-func = (or (symbol-function name) 'noflet|base)
          ;; Use the interactive form of the new definition if
