@@ -7,7 +7,7 @@ like macros.
 
 It's great for test code when you need to mock another function.
 
-This is useful for definining functions that overide a base definition
+This is useful for defining functions that overide a base definition
 in some way. You get access to the original (before you re-defined it)
 function through a different name.
 
