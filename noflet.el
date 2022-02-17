@@ -116,6 +116,7 @@ name."
        (- (point)
           (line-beginning-position)))))
 
+;;;###autoload
 (defmacro noflet (bindings &rest body)
   "Make local function BINDINGS allowing access to the original.
 
@@ -145,6 +146,7 @@ points to `noflet|base' for all new bindings."
            (indent noflet-indent-func))
   (apply 'noflet|expand bindings body))
 
+;;;###autoload
 (defmacro nolexflet (bindings &rest body)
   "Lexical version.
 
