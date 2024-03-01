@@ -6,6 +6,7 @@
 ;; Keywords: lisp
 ;; Version: 0.0.15
 ;; Url: https://github.com/nicferrier/emacs-noflet
+;; Package-Requires: ((cl-lib "0.4") (dash "2.10.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -28,7 +29,8 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'dash)
+(eval-when-compile (require 'cl-lib))
 (if (version< emacs-version "24.4.1")
     (load-library "cl-indent")
     (require 'cl-indent))
@@ -155,7 +157,7 @@ maintainers refuse to add the correct indentation spec to
            (indent noflet-indent-func))
   `(cl-flet ,bindings ,@body))
 
-(defmacro* letn (tag bindings &rest body)
+(cl-defmacro letn (tag bindings &rest body)
   (declare (debug (sexp sexp &rest form))
            (indent 2))
   `(cl-labels ((,tag ,(-map 'car bindings) ,@body))
